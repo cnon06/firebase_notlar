@@ -71,7 +71,83 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Notlar"),
+        leading:
+        IconButton(
+          icon: Icon(Icons.exit_to_app),
+          onPressed: ()
+          {
+            exit(0);
+          },
+
+        ),
+
+
+        title:
+        Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Notlar Uygulaması", style: TextStyle(color: Colors.white, fontSize: 16),),
+          StreamBuilder<DatabaseEvent>(
+            stream:  refTest.onValue,
+            builder: (context,event)
+            {
+              double ortalama=0.0;
+              if(event.hasData)
+              {
+
+
+                List? notListesi = <Notlar>[];
+                var gelenDegerler = event.data!.snapshot.value as dynamic;
+
+                if(gelenDegerler != null)
+                {
+                  final _resultList = Map<String, dynamic>.from(gelenDegerler as LinkedHashMap);
+
+                  double toplam = 0;
+
+                  for (var key in _resultList.keys) {
+
+                    Map<String, dynamic> map2 = Map.from(_resultList[key]);
+
+                    int notToplam = map2["not1"]+ map2["not2"];
+
+
+                 toplam+=(notToplam/2);
+
+                   // notListesi.add(Notlar(key,map2["ders_adi"],map2["not1"],map2["not2"]));
+                    // '${map2["ders_adi"]}, ${map2["not1"]}, ${map2["not2"]}'
+                  }
+                  ortalama=toplam/_resultList.length;
+                }
+
+
+                /*
+                    var notListesi = event.data;
+                     if(!notListesi!.isEmpty)
+                {
+                  double toplam = 0.0;
+                  for(var n in notListesi)
+                  {
+                    toplam += (n.not1+n.not2)/2;
+                  }
+
+                  ortalama = toplam/notListesi.length;
+                }
+                 */
+
+
+
+
+                return Text("Ortalama: ${ortalama.toInt()}", style: TextStyle(color: Colors.white, fontSize: 14),);
+              }
+              else return Text("Ortalama: 0", style: TextStyle(color: Colors.white, fontSize: 14),);
+            },
+
+          ),
+        ],
+
+
+      ),
       ),
       body: WillPopScope(
         onWillPop: ()
